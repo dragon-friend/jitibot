@@ -4,14 +4,15 @@ from mastodon   import Mastodon
 from time       import sleep
 from getpass    import getpass
 from webbrowser import open_new_tab
+from signal     import signal
 
 
 jiti_instance = "https://jitsi.tildeverse.org/"
 
-instance  = input("Instance name:")
-email     = input("email:")
+instance  = input("Instance name:\n")
+email     = input("email:\n")
 password  = getpass("Password:")
-jiti_name = jiti_instance + input("Name for the jiti:")
+jiti_name = jiti_instance + input("Name for the jiti:\n")
 
 toot_message = f"its time for another fucken jiti!!!\n\
                  {jiti_name}\n\
@@ -42,9 +43,15 @@ mastodon = Mastodon(
     api_base_url=instance
 )
 
-open_new_tab(jiti_instance)
+open_new_tab(jiti_name)
 
 data = mastodon.status_post(status=toot_message, in_reply_to_id=None, media_ids=None, sensitive=False, visibility='private', spoiler_text=None, language=None, idempotency_key=None, content_type=None, scheduled_at=None, poll=None, quote_id=None)
+
+def deletetoot(id):
+    mastodon.status_delete(id)
+
+
+signal(signal.SIGINT, deletetoot(data['id']))
 
 while True:
     sleep(30)
